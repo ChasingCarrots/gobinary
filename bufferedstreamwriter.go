@@ -64,6 +64,12 @@ func (sw *BufferedStreamWriter) Seek(offset int64, whence int) (n int64, err err
 	return sw.offset, err
 }
 
+func (sw *BufferedStreamWriter) Write(p []byte) (n int, err error) {
+	buf := sw.GetWriteBuffer(len(p))
+	copy(buf, p)
+	return len(p), err
+}
+
 // Flush forces the buffer of this stream to be flushed to the underlying writer.
 func (sw *BufferedStreamWriter) Flush() {
 	if len(sw.buffer) == 0 {
