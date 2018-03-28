@@ -11,19 +11,12 @@ type SeekerView struct {
 	baseOffset int64
 }
 
-// NewSeekerView constructs a new view into a seeker with the given offset.
-func NewSeekerView(seeker io.Seeker, offset int64) *SeekerView {
-	return &SeekerView{
+// MakeSeekerView constructs a new view into a seeker with the given offset.
+func MakeSeekerView(seeker io.Seeker, offset int64) SeekerView {
+	return SeekerView{
 		Seeker:     seeker,
 		baseOffset: offset,
 	}
-}
-
-// Init initializes a seeker view for the cases where you want to use it as a
-// value instead of a pointer type.
-func (sv *SeekerView) Init(seeker io.Seeker, offset int64) {
-	sv.Seeker = seeker
-	sv.baseOffset = offset
 }
 
 // Seek seeks in the underlying seeker. When whence is SeekCurrent or SeekEnd,

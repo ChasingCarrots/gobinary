@@ -9,10 +9,10 @@ type StreamReaderView struct {
 }
 
 func MakeStreamReaderView(reader *StreamReader) StreamReaderView {
-	sr := StreamReaderView{}
-	sr.StreamReader = reader
-	sr.SeekerView.Init(sr.StreamReader, 0)
-	return sr
+	return StreamReaderView{
+		StreamReader: reader,
+		SeekerView:   MakeSeekerView(reader, 0),
+	}
 }
 
 func (sr *StreamReaderView) Offset() int64 {

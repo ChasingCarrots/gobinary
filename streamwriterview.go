@@ -6,10 +6,10 @@ type StreamWriterView struct {
 }
 
 func MakeStreamWriterView(writer *StreamWriter) StreamWriterView {
-	sw := StreamWriterView{}
-	sw.StreamWriter = writer
-	sw.SeekerView.Init(sw.StreamWriter, 0)
-	return sw
+	return StreamWriterView{
+		StreamWriter: writer,
+		SeekerView:   MakeSeekerView(writer, 0),
+	}
 }
 
 func (sw *StreamWriterView) Offset() int64 {

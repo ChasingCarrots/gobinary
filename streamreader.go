@@ -6,6 +6,7 @@ import (
 
 type StreamReader struct {
 	io.ReadSeeker
+	view   SeekerView
 	offset int64
 }
 
@@ -14,6 +15,7 @@ func NewStreamReader(reader io.ReadSeeker) *StreamReader {
 	return &StreamReader{
 		ReadSeeker: reader,
 		offset:     offset,
+		view:       MakeSeekerView(reader, 0),
 	}
 }
 
