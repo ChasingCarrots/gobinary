@@ -7,6 +7,9 @@ import (
 
 var NegativeOffset = errors.New("Cannot go to negative offset")
 
+// WriteBuffer is an in-memory buffer that grows dynamically to accomodate the
+// incoming writes. It is seekable; seeking beyond the end of the buffer also
+// increases the size of the buffer.
 type WriteBuffer struct {
 	buffer []byte
 	offset int64
@@ -59,10 +62,6 @@ func (wb *WriteBuffer) Write(p []byte) (n int, err error) {
 func (wb *WriteBuffer) WriteTo(w io.Writer) (n int64, err error) {
 	m, err := w.Write(wb.buffer)
 	return int64(m), err
-}
-
-func (wb *WriteBuffer) View(offset int64) WriteBufferView {
-	return NewWriteBufferView(wb, offset)
 }
 
 func (wb *WriteBuffer) Bytes() []byte {

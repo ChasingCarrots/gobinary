@@ -1,51 +1,33 @@
 package gobinary
 
-import "io"
-
 type StreamWriterView struct {
-	*BufferedStreamWriter
-	view SeekerView
+	*StreamWriter
+	SeekerView
 }
 
-func NewStreamWriterView(writer io.WriteSeeker, bufferSize int) StreamWriterView {
+func MakeStreamWriterView(writer *StreamWriter) StreamWriterView {
 	sw := StreamWriterView{}
-	sw.BufferedStreamWriter = NewBufferedStreamWriter(writer, bufferSize)
-	sw.view.Init(sw.BufferedStreamWriter, 0)
+	sw.StreamWriter = writer
+	sw.SeekerView.Init(sw.StreamWriter, 0)
 	return sw
 }
 
-func (sw *StreamWriterView) Seek(offset int64, whence int) (int64, error) {
-	return sw.view.Seek(offset, whence)
-}
-
 func (sw *StreamWriterView) Offset() int64 {
-	return sw.view.Local(sw.BufferedStreamWriter.Offset())
-}
-
-func (sw *StreamWriterView) Base() int64 {
-	return sw.view.Base()
+	return sw.SeekerView.Local(sw.GlobalOffset())
 }
 
 func (sw *StreamWriterView) GlobalOffset() int64 {
-	return sw.BufferedStreamWriter.Offset()
-}
-
-func (sw *StreamWriterView) Local(absOffset int64) int64 {
-	return sw.view.Local(absOffset)
-}
-
-func (sw *StreamWriterView) Copy() StreamWriterView {
-	sw.Flush()
-	copy := StreamWriterView{}
-	copy.BufferedStreamWriter = NewBufferedStreamWriter(sw.BufferedStreamWriter.writer, sw.BufferedStreamWriter.BufferSize())
-	copy.view.Init(copy.BufferedStreamWriter, 0)
-	return copy
+	return sw.StreamWriter.Offset()
 }
 
 func (sw *StreamWriterView) View(offset int64) {
-	sw.view = sw.view.View(offset)
+	sw.SeekerView = sw.SeekerView.View(offset)
 }
 
 func (sw *StreamWriterView) ViewHere() {
-	sw.view = sw.view.View(sw.Offset())
+	sw.SeekerView = sw.SeekerView.View(sw.Offset())
+}
+
+func (sv *StreamWriterView) Seek(offset int64, whence int) (int64, error) {
+	return sv.SeekerView.Seek(offset, whence)
 }
