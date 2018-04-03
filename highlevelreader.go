@@ -28,7 +28,10 @@ func (hlr *HighLevelReader) getReadBuffer(length int) []byte {
 	} else {
 		hlr.buffer = hlr.buffer[0:length]
 	}
-	hlr.Reader.Read(hlr.buffer)
+	_, err := hlr.Reader.Read(hlr.buffer)
+	if err != nil {
+		panic(err.Error())
+	}
 	return hlr.buffer
 }
 

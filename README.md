@@ -1,2 +1,12 @@
-# gobinary
-Functions for dealing with binary data on a high-level, inspired by the streaming classes in .NET
+# Go Binary
+`gobinary` is a Go package that contains a few structs intended to help with reading and writing of data, inspired by the `StreamReader` classes found in the .NET framework. The main difference to the existing reading facilities is that the abstractions provided by this package allow to query the current offset within the stream and allow acquire a view onto the stream, making all offsets reported relative to some base offset.
+
+## Stream reader, stream writer
+`StreamReader` and `StreamWriter` are wrappers around `io.ReadSeeker` and `io.WriteSeeker`, respectively, that contain an additional offset. They should be thought of as specific positions within the underlying reader/writer that automatically update on reading and writing. Multiple `StreamReader`s and `StreamWriter`s can share the same underlying reader/writer without changing each other's offset. Use the `SeekCurrent` method on a `StreamReader` /` StreamWriter` to set the underlying reader/writer to the offset of this instance. This is not meant to be used for multithreaded access to a reader/writer; that would require additional locking around reading and writing operations.
+
+## Seeker view, stream reader view, stream writer view
+`SeekerView` is a light-weight wrapper around an `io.Seeker` that contains a base offset relative to which all other offset values are specified. Specifically, `MakeSeekerView` allows you to wrap an `io.Seeker` with a `SeekerView` with a given base offset. Use `Offset`, `Base`, and `GlobalOffset` to get the current offset, the base offset, and the current offset in global 'coordinates'. Use `Local` to convert a global offset to one local to this view.
+The `View` and `ViewHere` method provide means to create a new view with a new base offset from a given view. These views do not stack, that is, each `SeekerView` contains its absolute offset in the underlying stream, and not its relative offset to the view it was created from. `StreamReaderView` and `StreamWriterView` are combinations of `SeekerView` and `Stream(Reader|Writer)`. Their `View` and `ViewHere` methods modify the receiver and refocus its view.
+
+## High level reader / writer
+`HighLevelReader` and `HighLevelWriter` are wrappers around `io.Reader` and `io.Writer` that provide methods for reading and writing primitive data types from a little endian encoded source. Their interface should be fairly self explanatory. It is noteworthy that the `HighLevelReader` does *not* return error codes but fails with a panic if a read doesn't succeed.
